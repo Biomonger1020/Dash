@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 10px;
+        }
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+            border: 1px solid #8FBC8F;
+        }
+        th, td {
+            padding: 5px;
+            text-align: left;
+            border: 1px solid #8FBC8F;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 3px;
+            box-sizing: border-box;
+        }
+        .status-box {
+            width: 100%;
+            height: 20px;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .status-box.green {
+            background-color: #8FBC8F;
+        }
+        .status-box.red {
+            background-color: #cd2626;
+        }
+        textarea {
+            width: 100%;
+            height: 40px;
+            box-sizing: border-box;
+        }
+        .summary {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #cd2626;
+            background-color: #fbeaea;
+            color: #cd2626;
+        }
+        .top-right {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            text-align: right;
+        }
+        .top-right a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+        .top-right a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-right">
+        <p style="margin: 0;">"Have you tried turning it off and on again?"</p>
+        <a href="https://youtu.be/nn2FB1P_Mn8?si=Lb869YHGkOGBGpyr" target="_blank">Watch here</a>
+    </div>
+
+    <h1>Status Dashboard</h1>
+
+    <div id="summary" class="summary" style="display: none;">
+        <strong>Issues detected:</strong>
+        <ul id="issueList"></ul>
+    </div>
+
+    <div class="dashboard">
+        <script>
+            const tableTitles = [
+                "MPA Sprechstunde", "MPA Büro", "DEM Praxis", "DEM Home", "HEL Praxis",
+                "HEL Home", "POS Praxis", "POS Home", "ROD", "BEM", "PA"
+            ];
+
+            const defaultRows = [
+                "Simed", "Mail", "Bildschirmfreigabe", "HIN Client", "HA Info",
+                "Compendium", "Emedko", "Gebäudesteuerung", "GL", "Serverdokumente",
+                "VPN", "Adressbuch", "Weiteres", "Weiteres", ""
+            ];
+
+            tableTitles.forEach(title => {
+                document.write(`
+                    <table>
+                        <thead>
+                            <tr>
+                                <th colspan="2">${title}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `);
+
+                defaultRows.forEach((row, index) => {
+                    if (index === defaultRows.length - 1) {
+                        document.write(`
+                            <tr>
+                                <td colspan="2">
+                                    <textarea placeholder="Freitext"></textarea>
+                                </td>
+                            </tr>
+                        `);
+                    } else {
+                        document.write(`
+                            <tr>
+                                <td>
+                                    <input type="text" value="${row}">
+                                </td>
+                                <td>
+                                    <div class="status-box green" onclick="toggleStatus(this, '${title}', '${row}')">OK</div>
+                                </td>
+                            </tr>
+                        `);
+                    }
+                });
+
+                document.write(`
+                        </tbody>
+                    </table>
+                `);
+            });
+
+            function toggleStatus(element, tableName, rowName) {
+                const issueList = document.getElementById('issueList');
+                const summary = document.getElementById('summary');
+
+                if (element.classList.contains('red')) {
+                    element.classList.remove('red');
+                    element.classList.add('green');
+                    element.textContent = 'OK';
+
+                    // Remove from issue list
+                    const items = Array.from(issueList.children);
+                    items.forEach(item => {
+                        if (item.textContent === `${tableName} - ${rowName}`) {
+                            issueList.removeChild(item);
+                        }
+                    });
+                } else {
+                    element.classList.remove('green');
+                    element.classList.add('red');
+                    element.textContent = 'OFF';
+
+                    // Add to issue list
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${tableName} - ${rowName}`;
+                    issueList.appendChild(listItem);
+                }
+
+                // Show or hide summary
+                summary.style.display = issueList.children.length > 0 ? 'block' : 'none';
+            }
+        </script>
+    </div>
+</body>
+</html>
